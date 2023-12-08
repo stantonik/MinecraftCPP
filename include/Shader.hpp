@@ -1,13 +1,15 @@
 #ifndef SHADER_HPP
 #define SHADER_HPP
 
-#ifndef __APPLE
 #include <GL/glew.h>
-#endif
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+using namespace glm;
 
 class Shader
 {
@@ -63,6 +65,12 @@ public:
   }
 
   void use() { glUseProgram(programID); }  
+
+  void setMat4(const char *name, mat4 value)
+  {
+    GLint loc = glGetUniformLocation(programID, name);
+    glUniformMatrix4fv(loc, 1, GL_FALSE, (float *)value_ptr(value));
+  }
 
 private:
   unsigned int programID = 0;

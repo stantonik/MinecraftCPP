@@ -1,3 +1,2 @@
 -Iinclude
--I/opt/homebrew/Cellar/glew/2.2.0_1/include/
--I/opt/homebrew/Cellar/glfw/3.3.8/include/
+-I/opt/homebrew/include/

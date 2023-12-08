@@ -1,14 +1,13 @@
 #ifdef __APPLE__
 #define GL_SILENCE_DEPRECATION
 #endif
-#ifdef __APPLE__
 #include <GL/glew.h>
-#endif
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <string>
 
 #include "Shader.hpp"
+#include "Camera.hpp"
 
 GLFWwindow *window;
 double dt = 0;
@@ -80,6 +79,17 @@ int main()
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
+    // matrix transform
+    mat4 projection(1.0f);
+    mat4 view(1.0f);
+    mat4 world(1.0f);
+
+    world = rotate(world, (float)glfwGetTime() * radians(50.0f), vec3(1.0f, 0.0f, 1.0f));
+
+    shader.setMat4("projection", projection);
+    shader.setMat4("view", view);
+    shader.setMat4("world", world);
+     
 
     glfwSwapBuffers(window);
     glfwPollEvents();
