@@ -33,6 +33,7 @@ int main()
   window = glfwCreateWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, TITLE, nullptr, nullptr);
   glfwMakeContextCurrent(window);
   glfwSetWindowSizeCallback(window, windowSizeCallback);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   if (glewInit() != GLEW_OK)
   {
@@ -40,6 +41,7 @@ int main()
   }
 
   // create a triangle
+  glEnable(GL_DEPTH_TEST);
   Shader shader("res/shader/vertex.shader", "res/shader/fragment.shader");
 
   float vertices[] = {
@@ -66,30 +68,80 @@ int main()
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
+  Camera camera(vec3(0, 0, 2));
+  camera.size.x = DEFAULT_WIDTH;
+  camera.size.y = DEFAULT_HEIGHT;
+  bool firstMouse = true;
+  double xLastMouse, yLastMouse;
+  // matrix transform
+  mat4 projection(1.0f);
+  mat4 view(1.0f);
+  mat4 world(1.0f);
+
+
   double timer = 0;
   while(!glfwWindowShouldClose(window))
   {
     double previous_time = glfwGetTime();
 
     glClearColor(0, 0, 1, 1);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // render...
     shader.use();
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    // matrix transform
-    mat4 projection(1.0f);
-    mat4 view(1.0f);
-    mat4 world(1.0f);
 
-    world = rotate(world, (float)glfwGetTime() * radians(50.0f), vec3(1.0f, 0.0f, 1.0f));
+    //get key input
+    float speed = 5;
+    if (glfwGetKey(window, GLFW_KEY_W))
+      camera.position += (float)dt * camera.forward() * speed; 
+    else if (glfwGetKey(window, GLFW_KEY_S))
+      camera.position -= (float)dt * camera.forward() * speed; 
+    if (glfwGetKey(window, GLFW_KEY_D))
+      camera.position += (float)dt * camera.right() * speed; 
+    else if (glfwGetKey(window, GLFW_KEY_A))
+      camera.position -= (float)dt * camera.right() * speed; 
+    if (glfwGetKey(window, GLFW_KEY_SPACE))
+      camera.position += (float)dt * camera.sWorldUp * speed; 
+    else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT))
+      camera.position -= (float)dt * camera.sWorldUp * speed; 
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE))
+      glfwSetWindowShouldClose(window, true);
+    
+    //get mouse input
+    double xmouse, ymouse;
+    double dx = 0, dy = 0;
+    glfwGetCursorPos(window, &xmouse, &ymouse);
+    if (firstMouse)
+    {
+      xLastMouse = xmouse;
+      yLastMouse = ymouse;
+      firstMouse = false;
+    }
+    else 
+    {
+      dx = xmouse - xLastMouse;
+      dy = ymouse - yLastMouse;
+      xLastMouse = xmouse;
+      yLastMouse = ymouse;
+    }
+    float mouseSensivity = 0.6f;
+    camera.rotation.x += dy * mouseSensivity;
+    camera.rotation.y += dx * mouseSensivity;
+
+    projection = camera.getProjectionMatrix(); 
+
+    //world = translate(world, 1 * (float)dt * camera.forward());
+    //world = rotate(world, (float)dt * radians(50.0f), vec3(0.0f, 0.0f, 1.0f));
+
+    view = camera.getViewMatrix();
 
     shader.setMat4("projection", projection);
     shader.setMat4("view", view);
     shader.setMat4("world", world);
-     
+
 
     glfwSwapBuffers(window);
     glfwPollEvents();
