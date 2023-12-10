@@ -11,20 +11,14 @@ public:
   float nearClipping = 0.1f;
   float farClipping = 100.0f;
 
-  Camera(vec3 position, vec3 rotation = vec3()) : Object(position, rotation)
-  {
+  //static Camera *main;
+  //static unsigned int cameraCount;
 
-  }
+  Camera(vec3 position, vec3 rotation = vec3());
+  ~Camera();
 
-  mat4 getViewMatrix()
-  {
-    return lookAt(position, position + forward(), sWorldUp);
-  }
-
-  mat4 getProjectionMatrix()
-  {
-    return perspective(radians(fov), size.x / size.y, nearClipping, farClipping);
-  }
+  mat4 getViewMatrix();
+  mat4 getProjectionMatrix();
 };
 
 #endif

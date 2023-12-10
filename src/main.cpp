@@ -1,3 +1,4 @@
+#include <vector>
 #ifdef __APPLE__
 #define GL_SILENCE_DEPRECATION
 #endif
@@ -8,6 +9,7 @@
 
 #include "Shader.hpp"
 #include "Camera.hpp"
+#include "Mesh.hpp"
 
 GLFWwindow *window;
 double dt = 0;
@@ -44,29 +46,17 @@ int main()
   glEnable(GL_DEPTH_TEST);
   Shader shader("res/shader/vertex.shader", "res/shader/fragment.shader");
 
-  float vertices[] = {
-    // positions         // colors
-    0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
-    -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
-    0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
-  };
+  Vertex a = { vec3(0.5f, -0.5f, 0), vec3(0), vec2(0) };
+  Vertex b = { vec3(-0.5f, -0.5f, 0), vec3(0), vec2(0) };
+  Vertex c = { vec3(0, 0.5f, 0), vec3(0), vec2(0) };
 
-  unsigned int VBO, VAO;
-  glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
-  glBindVertexArray(VAO);
+  std::vector<Vertex> vertices { a, b, c };
+  std::vector<unsigned int> indices { 0, 1, 2 };
 
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
-
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(sizeof(float) * 3));
-  glEnableVertexAttribArray(1);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
+  Mesh triangle;
+  triangle.vertices = vertices;
+  triangle.indices = indices;
+  triangle.upload();
 
   Camera camera(vec3(0, 0, 2));
   camera.size.x = DEFAULT_WIDTH;
@@ -89,8 +79,7 @@ int main()
 
     // render...
     shader.use();
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    triangle.draw();
 
     //get key input
     // project forward vector into (0, x, z) plan
@@ -138,9 +127,6 @@ int main()
     if (camera.rotation.x < -89.0f) camera.rotation.x = -89.0f;
 
     projection = camera.getProjectionMatrix(); 
-
-    //world = translate(world, 1 * (float)dt * camera.forward());
-    //world = rotate(world, (float)dt * radians(50.0f), vec3(0.0f, 0.0f, 1.0f));
 
     view = camera.getViewMatrix();
 
