@@ -7,9 +7,11 @@
 #include <iostream>
 #include <string>
 
+#include "TextureManager.hpp"
 #include "Shader.hpp"
 #include "Camera.hpp"
 #include "Mesh.hpp"
+#include "Chunk.hpp"
 
 GLFWwindow *window;
 double dt = 0;
@@ -42,21 +44,16 @@ int main()
     throw std::runtime_error("Could not initialize GLEW.");
   }
 
-  // create a triangle
   glEnable(GL_DEPTH_TEST);
   Shader shader("res/shader/vertex.shader", "res/shader/fragment.shader");
+  
+  // TEXTURES
+  TextureManager texManager;
+  texManager.importTexture("res/texture/dirt.png");
+  texManager.loadTextures();
+  
 
-  Vertex a = { vec3(0.5f, -0.5f, 0), vec3(0), vec2(0) };
-  Vertex b = { vec3(-0.5f, -0.5f, 0), vec3(0), vec2(0) };
-  Vertex c = { vec3(0, 0.5f, 0), vec3(0), vec2(0) };
-
-  std::vector<Vertex> vertices { a, b, c };
-  std::vector<unsigned int> indices { 0, 1, 2 };
-
-  Mesh triangle;
-  triangle.vertices = vertices;
-  triangle.indices = indices;
-  triangle.upload();
+  Chunk chunk(0, 0);
 
   Camera camera(vec3(0, 0, 2));
   camera.size.x = DEFAULT_WIDTH;
@@ -74,12 +71,12 @@ int main()
   {
     double previous_time = glfwGetTime();
 
-    glClearColor(0, 0, 1, 1);
+    glClearColor(0.7f, 0.8f, 0.9f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // render...
     shader.use();
-    triangle.draw();
+    chunk.mesh.draw();
 
     //get key input
     // project forward vector into (0, x, z) plan
@@ -102,6 +99,7 @@ int main()
       camera.position -= (float)dt * camera.sWorldUp * speed; 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE))
       glfwSetWindowShouldClose(window, true);
+
     
     //get mouse input
     double xmouse, ymouse;

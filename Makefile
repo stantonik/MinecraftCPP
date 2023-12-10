@@ -7,6 +7,7 @@ OBJ_DIR = $(BIN_DIR)/obj
 
 INC := -Iinclude
 INC += -I/opt/homebrew/include
+INC += -Ilib/stb-master
 
 LIBS := /opt/homebrew/lib/libGLEW.2.2.0.dylib
 LIBS += /opt/homebrew/lib/libglfw.3.3.dylib
