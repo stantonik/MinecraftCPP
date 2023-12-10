@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 #include <string>
+#include "Quaternion.hpp"
 
 using namespace glm;
 
@@ -34,26 +35,39 @@ public:
 
   vec3 up()
   {
-    float x = -sin(radians(rotation.z));
-    float y = cos(radians(rotation.x)) + cos(radians(rotation.z));
-    float z = sin(radians(rotation.x));
-    return glm::normalize(vec3(x, y, z));
+    computeVectors();
+    return mUp;
   }
 
   vec3 right()
   {
-    return glm::normalize(-cross(up(), forward()));
+    computeVectors();
+    return mRigth;
   }
 
   vec3 forward()
   {
-    float x = sin(radians(rotation.y));
-    float y = -sin(radians(rotation.x));
-    float z = -cos(radians(rotation.y)) - cos(radians(rotation.x));
-    return glm::normalize(vec3(x, y, z));
+    computeVectors();
+    return mForward;
   }
 
 private:
+  vec3 mForward = vec3(0, 0, -1);
+  vec3 mRigth = vec3(1, 0, 0);
+  vec3 mUp = vec3(0, 1, 0);
+
+  const vec3 DEFAULT_FORWARD = vec3(0, 0, -1);
+  const vec3 DEFAULT_RIGHT = vec3(1, 0, 0);
+  const vec3 DEFAULT_UP = vec3(0, 1, 0);
+
+  void computeVectors()
+  {
+    vec3 u = Quaternion::rotate(DEFAULT_FORWARD, -rotation.y, DEFAULT_UP);
+    mRigth = Quaternion::rotate(DEFAULT_RIGHT, -rotation.y, DEFAULT_UP);
+    
+    mUp = Quaternion::rotate(DEFAULT_UP, -rotation.x, mRigth);
+    mForward = Quaternion::rotate(u, -rotation.x, mRigth);
+  }
 };
 
 #endif

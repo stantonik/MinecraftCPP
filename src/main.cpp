@@ -92,13 +92,17 @@ int main()
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
-
     //get key input
+    // project forward vector into (0, x, z) plan
+    vec3 forward = camera.forward();
+    forward.y = 0;
+    forward = normalize(forward);
+
     float speed = 5;
     if (glfwGetKey(window, GLFW_KEY_W))
-      camera.position += (float)dt * camera.forward() * speed; 
+      camera.position += (float)dt * forward * speed; 
     else if (glfwGetKey(window, GLFW_KEY_S))
-      camera.position -= (float)dt * camera.forward() * speed; 
+      camera.position -= (float)dt * forward * speed; 
     if (glfwGetKey(window, GLFW_KEY_D))
       camera.position += (float)dt * camera.right() * speed; 
     else if (glfwGetKey(window, GLFW_KEY_A))
@@ -130,6 +134,8 @@ int main()
     float mouseSensivity = 0.6f;
     camera.rotation.x += dy * mouseSensivity;
     camera.rotation.y += dx * mouseSensivity;
+    if (camera.rotation.x > 89.0f) camera.rotation.x = 89.0f;
+    if (camera.rotation.x < -89.0f) camera.rotation.x = -89.0f;
 
     projection = camera.getProjectionMatrix(); 
 
