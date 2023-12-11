@@ -50,10 +50,13 @@ int main()
   // TEXTURES
   TextureManager texManager;
   texManager.importTexture("res/texture/dirt.png");
-  texManager.loadTextures();
+  texManager.importTexture("res/texture/oak_planks.png");
+  texManager.loadTextureCollage();
   
 
   Chunk chunk(0, 0);
+  chunk.texManager = &texManager;
+  chunk.generate();
 
   Camera camera(vec3(0, 0, 2));
   camera.size.x = DEFAULT_WIDTH;

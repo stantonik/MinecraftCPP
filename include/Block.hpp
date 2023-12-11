@@ -45,6 +45,10 @@ public:
   {
     vec2(0, 0), vec2(1, 0), vec2(0, 1), vec2(0, 1), vec2(1, 0), vec2(1, 1)
   };
+  static constexpr unsigned int uvIndices[6]
+  {
+    0, 1, 3, 3, 1, 2
+  };
 
   Block();
   Block(int x, int y, int z, unsigned int id = 0, Direction orientation = Direction::FORWARD);

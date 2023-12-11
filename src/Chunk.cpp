@@ -8,13 +8,16 @@ Chunk::Chunk(int x, int z) : Object()
 {
   localPosition = vec3(x, 0, z);
   position = localPosition * static_cast<float>(WIDTH_IN_BLOCK);
-
-  populate();
-  updateMesh();
 }
 
 Chunk::~Chunk()
 {
+}
+
+void Chunk::generate()
+{
+  populate();
+  updateMesh();
 }
 
 void Chunk::populate()
@@ -25,6 +28,8 @@ void Chunk::populate()
       {
         vec3 pos = vec3(x, y, z) + this->position;
         Block block(pos.x, pos.y, pos.z);
+        if (y == 0) block.id = 0;
+        else block.id = 1;
         setBlock(block);
       }
 }
@@ -50,11 +55,12 @@ void Chunk::updateMesh()
   {
     for (int f = 0; f < 6; f++)
     {
+      Texture &texture = texManager->mTextures[block.id];
       for (int v = 0; v < 6; v++)
       {
         Vertex vertex = Block::vertices[Block::indices[v + f * 6]];
         vertex.position += block.position;
-        vertex.uv = Block::uvs[v];
+        vertex.uv = texture.uvs[Block::uvIndices[v]];
         mesh.vertices.push_back(vertex);
         mesh.indices.push_back(vertexCount++);
       }

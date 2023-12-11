@@ -4,7 +4,7 @@
 
 namespace fs=std::filesystem;
 
-TextureManager::TextureManager()
+TextureManager::TextureManager() : width(mWidth), height(mHeight)
 {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -14,10 +14,7 @@ TextureManager::TextureManager()
 
 TextureManager::~TextureManager()
 {
-  for (Texture &texture : mTextures)
-  {
-    stbi_image_free(texture.data);
-  }
+  stbi_image_free(mCollage);
 }
 
 int TextureManager::importTexture(const char *path)
@@ -38,13 +35,12 @@ int TextureManager::importTexture(const char *path)
   return 0;
 }
 
-int TextureManager::loadTextures()
+int TextureManager::loadTextureCollage()
 {
-  Texture &texture = mTextures[0];
-  mData = texture.data;
-  if (mData)
+  createCollage();
+  if (mCollage)
   {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture.width, texture.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, mData);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, mCollage);
     glGenerateMipmap(GL_TEXTURE_2D);
   }
   else
@@ -55,3 +51,29 @@ int TextureManager::loadTextures()
   return 0;
 }
 
+void TextureManager::createCollage()
+{
+  mHeight = mTextures[0].height;
+  mWidth = 0;
+  for (Texture &texture : mTextures) mWidth += texture.width;
+
+  mCollage = new unsigned char[mHeight * mWidth * 4];
+  for (int i = 0; i < mTextures.size(); ++i)
+  {
+    Texture &texture = mTextures[i];
+
+    for (int j = 0; j < 4; ++j)
+    {
+      float step = 1.0f / static_cast<float>(mTextures.size());
+      texture.uvs[j].x *= step; 
+      texture.uvs[j].x += step * i;
+    }
+
+    for (int j = 0; j < mHeight; ++j)
+    {
+      int destOffset = mTextures.size() * texture.width * 4 * j + (i * texture.width * 4);
+      int srcOffset = texture.width * j * 4;
+      memcpy(mCollage + destOffset, texture.data + srcOffset, texture.width * 4);
+    }
+  }
+}
