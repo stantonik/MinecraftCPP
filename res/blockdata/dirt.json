@@ -1,0 +1,13 @@
+{
+  "main_texture":"dirt.png",
+  "different_faces":[],
+  "alt_textures":
+  {
+    "front_face":"grass_block_side.png",
+    "back_face":"grass_block_side.png",
+    "right_face":"grass_block_side.png",
+    "left_face":"grass_block_side.png",
+    "top_face":"grass_block_top.png",
+    "bottom_face":""
+  }
+}

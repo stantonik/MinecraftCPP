@@ -1,0 +1,13 @@
+{
+  "main_texture":"",
+  "different_faces":[],
+  "alt_textures":
+  {
+    "front_face":"",
+    "back_face":"",
+    "right_face":"",
+    "left_face":"",
+    "top_face":"",
+    "bottom_face":""
+  }
+}

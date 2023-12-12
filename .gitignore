@@ -33,6 +33,5 @@
 
 Minecraft
 *.swp
-obj
-.DS_Store
-.DS_Store
+**/obj
+**/.DS_Store
