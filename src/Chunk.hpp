@@ -14,7 +14,9 @@ class Chunk : public Object
 {
 public:
   static constexpr unsigned int WIDTH_IN_BLOCK = 16;
-  static constexpr unsigned int HEIGTH_IN_BLOCK = 4;
+  static constexpr unsigned int HEIGTH_IN_BLOCK = 10;
+
+  float ySurface = HEIGTH_IN_BLOCK;
 
   Mesh mesh;
   World *world;

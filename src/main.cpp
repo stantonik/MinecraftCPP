@@ -9,7 +9,7 @@
 
 #include "gfx/TextureManager.hpp"
 #include "gfx/Shader.hpp"
-#include "Camera.hpp"
+#include "gfx/Camera.hpp"
 #include "InputManager.hpp"
 #include "Player.hpp"
 #include "World.hpp"
@@ -22,23 +22,9 @@ float dt = 0;
 const int DEFAULT_WIDTH = 800;
 const int DEFAULT_HEIGHT = 600;
 const char *TITLE = "Minecraft C++";
+bool VSYNC = false;
 
 void windowSizeCallback(GLFWwindow *window, int width, int height) { glViewport(0, 0, width, height); }
-
-bool clickable = true;
-bool onCollisionCallback(World *_world, glm::vec3 pos, glm::vec3 *history, unsigned int count)
-{
-  Chunk *actualChunk;Block *block = _world->getBlock(pos, &actualChunk);
-  if (block != nullptr)
-  {
-    if (block->id == 0) return true;
-    block->id = 0;
-    block->isTransparent = true;
-    actualChunk->updateMesh();
-    return false;
-  }
-  return true;
-}
 
 int main()
 {
@@ -55,8 +41,6 @@ int main()
   window = glfwCreateWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, TITLE, nullptr, nullptr);
   glfwMakeContextCurrent(window);
   glfwSetWindowSizeCallback(window, windowSizeCallback);
-  // hide and lock cursor in the middle
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   if (glewInit() != GLEW_OK) throw std::runtime_error("Could not initialize GLEW.");
 
@@ -69,7 +53,7 @@ int main()
   texManager.loadTextureCollage();
 
   // WORLD
-  World world;
+  World world(dt);
   world.generate(&texManager);
 
   Camera camera(vec3(0, 0, 2));
@@ -77,9 +61,10 @@ int main()
   camera.size.y = DEFAULT_HEIGHT;
 
   // INPUT MANAGER
-  Entity entity;
-  InputManager inputManager(window, &entity, &camera);
+  world.players[0]->attachCamera(&camera);
+  InputManager inputManager(window, world.players[0]);
   glfwSetWindowUserPointer(window, &inputManager);
+  glfwSwapInterval(VSYNC);
 
 
   // matrix transform
@@ -111,6 +96,8 @@ int main()
     glClearColor(0.7f, 0.8f, 0.9f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glfwPollEvents();
+
     // render...
     shader.use();
     for (int x = 0; x < World::SIZE_IN_CHUNK; ++x)
@@ -126,24 +113,13 @@ int main()
     projection = camera.getProjectionMatrix(); 
     view = camera.getViewMatrix();
 
-    // send transform matrix to the shaders
+    // send uniform to shaders
     shader.setMat4("projection", projection);
     shader.setMat4("view", view);
     shader.setMat4("world", model);
-
-    // ephemere breaking block test
-    Utils::DDA dda;
-    dda.maxDistance = 6;
-    dda.world = &world;
-    dda.onCollisionCallback = onCollisionCallback;
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) && clickable)
-    {
-      //clickable = false;
-      dda.ray(camera.position + glm::vec3(0, 1, 0), camera.forward());
-    }
+    shader.setVec3("sunPos", world.lightPos);
 
     glfwSwapBuffers(window);
-    glfwPollEvents();
   }
 
   glfwTerminate();

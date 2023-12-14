@@ -1,11 +1,11 @@
 #include "Player.hpp"
 
-Player::Player()
+Player::Player() : Entity()
 {
-  
+
 }
 
-Player::Player(glm::vec3 position, glm::vec3 rotation)
+Player::Player(glm::vec3 position, glm::vec3 rotation, World *world) : Entity(position, rotation, world)
 {
 
 }
@@ -14,3 +14,7 @@ Player::~Player()
 {
 }
 
+void Player::update()
+{
+
+}

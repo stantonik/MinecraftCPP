@@ -68,6 +68,12 @@ public:
 
   void use() { glUseProgram(programID); }  
 
+  void setVec3(const char *name, vec3 value)
+  {
+    GLint loc = glGetUniformLocation(programID, name);
+    glUniform3fv(loc, 1, (float*)glm::value_ptr(value));
+  }
+
   void setMat4(const char *name, mat4 value)
   {
     GLint loc = glGetUniformLocation(programID, name);

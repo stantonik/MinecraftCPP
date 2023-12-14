@@ -34,10 +34,13 @@ void Chunk::populate()
         glm::vec3 pos = glm::vec3(x, y, z) + this->position;
         Block *block = new Block(pos.x, pos.y, pos.z);
         block->localPosition = glm::vec3(x, y, z);
-        if (y == 0) block->name = "oak_planks";
-        else block->name = "dirt";
-        block->id = 1;
-        block->isTransparent = false;
+        if (y < ySurface)
+        {
+          if (y == 0) block->name = "oak_planks";
+          else block->name = "dirt";
+          block->id = 1;
+          block->isTransparent = false;
+        }
 
         block->update();
         setBlock(block);
@@ -88,8 +91,10 @@ void Chunk::updateMesh()
 
           for (int v = 0; v < 6; v++)
           {
-            Vertex vertex = Block::vertices[Block::indices[v + f * 6]];
+            unsigned int index = Block::indices[v + f * 6];
+            Vertex vertex = Block::vertices[index];
             vertex.position += block->position;
+            vertex.normal = Block::normals[f];
             if (texture) vertex.uv = texture->uvs[Block::uvIndices[v]];
             mesh.vertices.push_back(vertex);
             mesh.indices.push_back(vertexCount++);

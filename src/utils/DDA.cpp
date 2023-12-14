@@ -10,14 +10,14 @@ void DDA::ray(glm::vec3 startPoint, glm::vec3 direction)
   glm::vec3 stepWeight;
   stepWeight.x = sqrt(1 + pow(direction.y / direction.x, 2) + pow(direction.z / direction.x, 2));
   stepWeight.y = sqrt(1 + pow(direction.y / direction.y, 2) + pow(direction.z / direction.y, 2));
-  stepWeight.z = sqrt(1 + pow(direction.y / direction.z, 2) + pow(direction.z / direction.y, 2));
+  stepWeight.z = sqrt(1 + pow(direction.y / direction.z, 2) + pow(direction.x / direction.z, 2));
 
   glm::ivec3 mapCheck = glm::floor(startPoint);
   glm::vec3 rayLength;
-  rayLength.x = step.x * (mapCheck.x + ((1.0f + step.x) / 2.0f) - startPoint.x) * stepWeight.x;
-  rayLength.y = step.y * (mapCheck.y + ((1.0f + step.y) / 2.0f) - startPoint.y) * stepWeight.y;
-  rayLength.z = step.z * (mapCheck.z + ((1.0f + step.z) / 2.0f) - startPoint.z) * stepWeight.z;
-
+  rayLength.x = step.x * (float(mapCheck.x) + ((1.0f + step.x) / 2.0f) - startPoint.x) * stepWeight.x;
+  rayLength.y = step.y * (float(mapCheck.y) + ((1.0f + step.y) / 2.0f) - startPoint.y) * stepWeight.y;
+  rayLength.z = step.z * (float(mapCheck.z) + ((1.0f + step.z) / 2.0f) - startPoint.z) * stepWeight.z;
+  
   std::vector<glm::vec3> collisionHistory;
   float distance = 0;
   while(distance < maxDistance)

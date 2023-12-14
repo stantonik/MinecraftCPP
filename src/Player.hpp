@@ -8,8 +8,10 @@ class Player : public Entity
 {
 public:
   Player();
-  Player(glm::vec3 position, glm::vec3 rotation = glm::vec3());
+  Player(glm::vec3 position, glm::vec3 rotation, World *world); 
   ~Player ();
+
+  void update() override;
 };
 
 #endif

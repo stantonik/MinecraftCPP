@@ -2,8 +2,9 @@
 #define INPUTMANAGER_HPP
 
 #include "Entity.hpp"
-#include "Camera.hpp"
+#include "World.hpp"
 #include <GLFW/glfw3.h>
+#include "utils/DDA.hpp"
 
 struct Mouse
 {
@@ -34,7 +35,7 @@ public:
   Mouse mouse;
   KeyBoard keyBoard;
 
-  InputManager (GLFWwindow *window, Entity *entity, Camera *camera);
+  InputManager (GLFWwindow *window, Entity *entity);
   ~InputManager ();
 
   void update(float &deltaTime);
@@ -44,6 +45,8 @@ private:
   static void scrollCallback(GLFWwindow *window, double xoffset, double yoffset);
   static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
   static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
+
+  static bool intersectionCallback(World *world, glm::vec3 pos, glm::vec3 *intersectionHistory, unsigned int intersectionCount);
 };
 
 #endif

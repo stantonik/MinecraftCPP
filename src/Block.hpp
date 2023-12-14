@@ -51,6 +51,7 @@ public:
 
   std::vector<std::string> textures;
   bool isTransparent = true;
+  bool isSolid = true;
 
   Block();
   Block(const Block &block);

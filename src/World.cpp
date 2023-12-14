@@ -1,6 +1,6 @@
 #include "World.hpp"
 
-World::World()
+World::World(float &deltaTime) : deltaTime(deltaTime)
 {
   
 }
@@ -11,14 +11,22 @@ World::~World()
 
 void World::generate(TextureManager *texManager)
 {
+  // generate chunks
   for (int x = 0; x < SIZE_IN_CHUNK; ++x)
     for (int z = 0; z < SIZE_IN_CHUNK; ++z)
     {
       Chunk *chunk = new Chunk(x, z, this);
       chunk->texManager = texManager;
+      chunk->ySurface = 4;
       chunk->generate();
       chunks[x][z] = chunk;
     }
+
+  // spawn entities
+
+  Player *player = new Player(glm::vec3(5, 10, 5), glm::vec3(0), this);
+  players.emplace_back(player);
+  entities.emplace_back(player);
 }
 
 Chunk *World::getChunk(glm::vec3 globalPos)
